@@ -1,0 +1,55 @@
+
+
+stages:
+    - test
+    - build
+    - deploy
+    - e2e
+
+variables:
+    CLI_PHPCS: "vendor/bin/phpcs --standard=psr2 src/"
+    CLI_PHPMD: "vendor/bin/phpmd src/ text phpmd.rules.xml"
+    CLI_PHPUNIT: "php -dzend_extension=xdebug.so -dmemory_limit=-1 vendor/bin/phpunit -v --colors=never --coverage-text --coverage-html public/_tests/coverage/ --log-junit public/_tests/junit.xml"
+    CLI_PHPUNIT_PARAM: ""
+    CLI_COMPOSER:       "composer install --no-progress --ansi -n --no-plugins --no-suggest"
+    CLI_COMPOSER_NODEV: "composer install --no-progress --ansi -n --no-plugins --no-suggest --no-dev"
+    CLI_COMPOSER_OUTDATED: "composer outdated -a -n -m --ansi --no-plugins --strict "
+    COMPOSER_CACHE_DIR: "cache/composer"
+
+.test-php:
+    stage: test
+    image: registry.gitlab.com/eappointment/php-base:7.3-dev
+    cache:
+        key: "zmsbase"
+        paths:
+            - cache
+    script:
+        - $CLI_COMPOSER
+        - $CLI_PHPCS
+        - $CLI_PHPMD
+        - $CLI_PHPUNIT $CLI_PHPUNIT_PARAM
+    artifacts:
+        paths:
+            - public/_tests
+        expire_in: 7d
+        reports:
+            junit: public/_tests/junit.xml
+
+.test-phpoutdated:
+    stage: test
+    image: registry.gitlab.com/eappointment/php-base:7.3-dev
+    cache:
+        key: "zmsbase"
+        paths:
+            - cache
+    allow_failure: true
+    script:
+        - $CLI_COMPOSER_NODEV
+        - $CLI_COMPOSER_OUTDATED 2>/dev/null
+    only:
+        refs:
+            - main
+        changes:
+            - composer.lock
+            - composer.json
+
