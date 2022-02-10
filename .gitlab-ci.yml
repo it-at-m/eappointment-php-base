@@ -18,6 +18,8 @@ variables:
     - main
   script:
     - docker login -u $CI_REGISTRY_USER  -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # Pull old image to use cache if possible
+    - docker pull "${IMAGE}:${VERSION}-dev" || echo "No preexisting image found"
     - docker build --pull
       --build-arg XDEBUG_VERSION=${XDEBUG_VERSION}
       --build-arg COMPOSER_VERSION=${COMPOSER_VERSION}
@@ -44,7 +46,7 @@ v8.1:
   variables:
     VERSION: "8.1"
     DOCKERFILE: php81/Dockerfile
-    XDEBUG_VERSION: "xdebug-3.0.4"
+    XDEBUG_VERSION: "xdebug-3.1.3"
 
 v7.3:
   <<: *BUILD
