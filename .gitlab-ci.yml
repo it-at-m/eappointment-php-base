@@ -2,7 +2,7 @@ stages:
   - build
 
 variables:
-  IMAGE: "registry.gitlab.com/eappointment/php-base"
+  IMAGE: "$CI_REGISTRY_IMAGE"
   # see available releases at https://hub.docker.com/_/composer and https://github.com/composer/composer/releases
   COMPOSER_VERSION: "2"
   # latest version; for 7.x we set this per Job to "xdebug-2.9.8"; for php 8+ we get xdebug 3; see https://xdebug.org/docs/upgrade_guide
@@ -12,10 +12,12 @@ variables:
 .build: &BUILD
   stage: build
   image: docker:stable
+  services:
+    - docker:dind
   only:
     - main
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker login -u $CI_REGISTRY_USER  -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build --pull
       --build-arg XDEBUG_VERSION=${XDEBUG_VERSION}
       --build-arg COMPOSER_VERSION=${COMPOSER_VERSION}
