@@ -1,0 +1,54 @@
+stages:
+  - build
+
+variables:
+  IMAGE: "registry.gitlab.com/eappointment/php-base"
+  # see available releases at https://hub.docker.com/_/composer and https://github.com/composer/composer/releases
+  COMPOSER_VERSION: "2"
+  # latest version; for 7.x we set this per Job to "xdebug-2.9.8"; for php 8+ we get xdebug 3; see https://xdebug.org/docs/upgrade_guide
+  XDEBUG_VERSION: "xdebug"
+
+# default branch template - build image tagged w/ minor php version
+.build: &BUILD
+  stage: build
+  image: docker:stable
+  only:
+    - master
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build --pull
+      --build-arg XDEBUG_VERSION=${XDEBUG_VERSION}
+      --build-arg COMPOSER_VERSION=${COMPOSER_VERSION}
+      --build-arg PHP_VERSION=${VERSION}
+      --target base
+      -f "${DOCKERFILE}"
+      -t "${IMAGE}:${VERSION}-base" .
+    - docker build --pull
+      --build-arg XDEBUG_VERSION=${XDEBUG_VERSION}
+      --build-arg COMPOSER_VERSION=${COMPOSER_VERSION}
+      --build-arg PHP_VERSION=${VERSION}
+      --target dev
+      -f "${DOCKERFILE}"
+      -t "${IMAGE}:${VERSION}-dev" .
+    - docker run --rm -i "${IMAGE}:${VERSION}-dev" php-fpm -t
+    - docker push "${IMAGE}:${VERSION}-base"
+    - docker push "${IMAGE}:${VERSION}-dev"
+
+
+# -------------------------------------------------------------------
+# Stage: build
+# -------------------------------------------------------------------
+
+v8.1:
+  <<: *BUILD
+  variables:
+    VERSION: "8.1"
+    DOCKERFILE: php81/Dockerfile
+    XDEBUG_VERSION: "xdebug-3.0.4"
+
+v7.3:
+  <<: *BUILD
+  variables:
+    VERSION: "7.3"
+    DOCKERFILE: php73/Dockerfile
+    XDEBUG_VERSION: "xdebug-2.9.8"
