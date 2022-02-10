@@ -18,7 +18,9 @@ variables:
 
 .test-php:
     stage: test
-    image: registry.gitlab.com/eappointment/php-base:7.3-dev
+    variables:
+      PHP_VERSION: 7.3
+    image: registry.gitlab.com/eappointment/php-base:${PHP_VERSION}-dev
     cache:
         key: "zmsbase"
         paths:
@@ -27,6 +29,7 @@ variables:
         - $CLI_COMPOSER
         - $CLI_PHPCS
         - $CLI_PHPMD
+        - docker-php-ext-enable xdebug
         - $CLI_PHPUNIT $CLI_PHPUNIT_PARAM
     artifacts:
         paths:
