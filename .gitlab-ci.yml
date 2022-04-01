@@ -26,7 +26,7 @@ variables:
       --target base
       -f "${DOCKERFILE}"
       -t "${IMAGE}:${VERSION}-base" .
-    - docker build --pull
+    - docker build --pull --no-cache
       --build-arg XDEBUG_VERSION=${XDEBUG_VERSION}
       --build-arg COMPOSER_VERSION=${COMPOSER_VERSION}
       --target dev
