@@ -68,6 +68,7 @@ RUN docker-php-ext-configure calendar \
     && docker-php-ext-install -j"$(nproc)" \
         bcmath \
         bz2 \
+        calendar \
         #exif \
         gd \
         #gmp \
