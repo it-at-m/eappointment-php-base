@@ -18,9 +18,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 # install software available by default in this image
 # hadolint ignore=DL3008,DL3009
 RUN docker-apt-clean-install \
+        calendar \
         #coreutils \
         #debconf-utils \
         #gettext \
+        git \
         gnupg2 \
         #gosu \
         libbz2-dev \
@@ -53,11 +55,13 @@ RUN docker-apt-clean-install \
 ENV TZ=Europe/Berlin
 
 # configure and install PHP extensions
-RUN docker-php-ext-configure gd \
+RUN docker-php-ext-configure calendar \
+    && docker-php-ext-configure gd \
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j"$(nproc)" \
         bcmath \
         bz2 \
+        calendar \
         #exif \
         gd \
         #gmp \
