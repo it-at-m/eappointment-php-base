@@ -23,6 +23,7 @@ RUN docker-apt-clean-install \
         #debconf-utils \
         #gettext \
         git \
+        wget \
         gnupg2 \
         #gosu \
         libbz2-dev \
