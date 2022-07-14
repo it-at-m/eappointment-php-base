@@ -31,6 +31,7 @@ variables:
         - $CLI_PHPMD
         - docker-php-ext-enable xdebug
         - $CLI_PHPUNIT $CLI_PHPUNIT_PARAM
+    coverage: '/^\s*Lines:\s*\d+.\d+\%/'
     artifacts:
         paths:
             - public/_tests
