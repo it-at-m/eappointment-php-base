@@ -95,7 +95,7 @@ COPY --from=composer-image /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_NO_INTERACTION=1
 ENV COMPOSER_HOME=/tmp/composer
 # show ext-* and lib-* entries one may use in composer.json on this platform
-RUN COMPOSER_ALLOW_SUPERUSER=1 composer show --platform --no-plugins --no-interaction
+#RUN COMPOSER_ALLOW_SUPERUSER=1 composer show --platform --no-plugins --no-interaction
 
 # Add locale de_DE.UTF-8
 RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
