@@ -60,9 +60,7 @@ RUN docker-php-ext-configure calendar \
     && docker-php-ext-configure gd \
         --enable-gd \
         #--with-webp-dir \
-        #--with-jpeg-dir \
-        --with-png-dir \
-        --with-zlib-dir \
+        #--with-jpeg \
         #--with-xpm-dir \
         --with-freetype-dir \
     && docker-php-ext-configure intl \
