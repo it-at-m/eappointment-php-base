@@ -62,7 +62,7 @@ RUN docker-php-ext-configure calendar \
         #--with-webp-dir \
         #--with-jpeg \
         #--with-xpm-dir \
-        --with-freetype-dir \
+        --with-freetype \
     && docker-php-ext-configure intl \
         --enable-intl \
     && docker-php-ext-install -j"$(nproc)" \
