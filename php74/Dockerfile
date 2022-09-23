@@ -58,7 +58,7 @@ ENV TZ=Europe/Berlin
 # configure and install PHP extensions
 RUN docker-php-ext-configure calendar \
     && docker-php-ext-configure gd \
-        --with-gd \
+        --enable-gd \
         #--with-webp-dir \
         #--with-jpeg-dir \
         --with-png-dir \
