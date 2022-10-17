@@ -57,3 +57,27 @@ variables:
             - composer.lock
             - composer.json
 
+.build-docker:
+    stage: build
+    image: docker:stable
+    services:
+        - docker:dind
+    variables:
+        PHP_VERSION: "7.3"
+        BUILD_CONTEXT: "."
+    script:
+        - VERSION=${CI_COMMIT_TAG:=dev-$CI_COMMIT_SHORT_SHA}
+        - echo "Version $VERSION"
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+        - docker pull "${CI_REGISTRY_IMAGE}:dev" || true
+        - docker build 
+            --pull
+            --build-arg PHP_VERSION=${PHP_VERSION}
+            -t "${CI_REGISTRY_IMAGE}:${VERSION}"
+            -t "${CI_REGISTRY_IMAGE}:dev"
+            "$BUILD_CONTEXT"
+        - docker push "${CI_REGISTRY_IMAGE}:${VERSION}"
+        - docker push "${CI_REGISTRY_IMAGE}:dev"
+    only:
+        - main
+        - tags
