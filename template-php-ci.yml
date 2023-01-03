@@ -80,5 +80,5 @@ variables:
         - tags
         - main
         - /^[a-z]+\/dev$/
-        - /^[a-z]+\/release\/[a-zA-Z0-9]+/
+        - /^[a-z]+\/release\/[a-zA-Z0-9_-]+/
         - /^[a-z]+\/prod$/
