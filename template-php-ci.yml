@@ -73,6 +73,7 @@ variables:
         - docker build 
             --pull
             --build-arg PHP_VERSION=${PHP_VERSION}
+            --build-arg REGISTRY_TAG=${TAG}
             -t "${CI_REGISTRY_IMAGE}:${TAG}"
             "$BUILD_CONTEXT"
         - docker push "${CI_REGISTRY_IMAGE}:${TAG}"
