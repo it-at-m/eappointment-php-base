@@ -80,8 +80,7 @@ variables:
     only:
         - tags
         - main
-        - /^[a-z]+\/dev$/
-        - /^[a-z]+\/release\/[a-zA-Z0-9_-]+/
-        - /^[a-z]+\/prod$/
-        - muc/dev-smoke
-        - muc/test-abnahme
+        - /^[a-z]+[\/-]dev(-[a-zA-Z0-9_-]+)?$/
+        - /^[a-z]+[\/-]test(-[a-zA-Z0-9_-]+)?$/
+        - /^[a-z]+[\/-]release[\/-][a-zA-Z0-9_-]+$/
+        - /^[a-z]+[\/-]prod$/
