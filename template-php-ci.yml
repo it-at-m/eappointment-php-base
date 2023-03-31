@@ -73,12 +73,14 @@ variables:
         - docker build 
             --pull
             --build-arg PHP_VERSION=${PHP_VERSION}
+            --build-arg IMAGE_TAG=${TAG}
             -t "${CI_REGISTRY_IMAGE}:${TAG}"
             "$BUILD_CONTEXT"
         - docker push "${CI_REGISTRY_IMAGE}:${TAG}"
     only:
         - tags
         - main
-        - /^[a-z]+\/dev$/
-        - /^[a-z]+\/release\/[a-zA-Z0-9_-]+/
-        - /^[a-z]+\/prod$/
+        - /^[a-z]+[\/-]dev(-[a-zA-Z0-9_-]+)?$/
+        - /^[a-z]+[\/-]test(-[a-zA-Z0-9_-]+)?$/
+        - /^[a-z]+[\/-]release[\/-][a-zA-Z0-9_-]+$/
+        - /^[a-z]+[\/-]prod$/
