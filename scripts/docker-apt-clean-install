@@ -4,6 +4,8 @@ set -eo pipefail
 
 apt-get update -yqq
 
+apt-get upgrade -yqq
+
 apt-get install --no-install-recommends -yqq "$@"
 
 apt-get remove --purge --auto-remove -y software-properties-common
