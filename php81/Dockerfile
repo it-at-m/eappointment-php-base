@@ -67,6 +67,7 @@ RUN docker-php-ext-configure calendar \
         #--with-webp-dir \
         #--with-xpm-dir \
     && docker-php-ext-configure intl \
+        --enable-intl \
     && docker-php-ext-install -j"$(nproc)" \
         bcmath \
         bz2 \
