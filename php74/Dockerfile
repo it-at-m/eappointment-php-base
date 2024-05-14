@@ -25,6 +25,7 @@ RUN docker-apt-clean-install \
         git \
         wget \
         gnupg2 \
+        gd \
         #gosu \
         libbz2-dev \
         #libexif-dev \
