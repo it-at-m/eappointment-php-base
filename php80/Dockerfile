@@ -38,7 +38,7 @@ RUN docker-apt-clean-install \
         #libpq-dev \
         #libpspell-dev \
         #libtidy-dev \
-        #libwebp-dev \
+        libwebp-dev \
         libxml2-dev \
         #libxpm-dev \
         #libxslt1-dev \
@@ -59,9 +59,13 @@ ENV TZ=Europe/Berlin
 # configure and install PHP extensions
 RUN docker-php-ext-configure calendar \
      && docker-php-ext-configure gd \
-         --with-freetype \
-         --with-jpeg \
-         --with-webp \
+         --with-gd \
+         --with-jpeg-dir \
+         --with-png-dir \
+         --with-zlib-dir \
+         --with-freetype-dir \
+         #--with-webp-dir \
+         #--with-xpm-dir \
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j"$(nproc)" \
         bcmath \

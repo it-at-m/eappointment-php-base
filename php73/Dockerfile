@@ -38,7 +38,7 @@ RUN docker-apt-clean-install \
         #libpq-dev \
         #libpspell-dev \
         #libtidy-dev \
-        #libwebp-dev \
+        libwebp-dev \
         libxml2-dev \
         #libxpm-dev \
         #libxslt1-dev \
@@ -60,12 +60,12 @@ ENV TZ=Europe/Berlin
 RUN docker-php-ext-configure calendar \
     && docker-php-ext-configure gd \
         --with-gd \
-        #--with-webp-dir \
         --with-jpeg-dir \
         --with-png-dir \
         --with-zlib-dir \
-        #--with-xpm-dir \
         --with-freetype-dir \
+        #--with-webp-dir \
+        #--with-xpm-dir \
     && docker-php-ext-configure intl \
         --enable-intl \
     && docker-php-ext-install -j"$(nproc)" \
