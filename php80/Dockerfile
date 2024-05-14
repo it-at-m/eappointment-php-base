@@ -61,8 +61,8 @@ RUN docker-php-ext-configure calendar \
     && docker-php-ext-configure gd \
         --with-gd \
         --with-jpeg-dir \
-        --with-png-dir \
-        --with-zlib-dir \
+        #--with-png-dir \
+        #--with-zlib-dir \
         --with-freetype-dir \
         #--with-webp-dir \
         #--with-xpm-dir \
