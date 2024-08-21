@@ -9,7 +9,7 @@ stages:
 variables:
     CLI_PHPCS: "vendor/bin/phpcs --standard=psr2 src/"
     CLI_PHPMD: "vendor/bin/phpmd src/ text phpmd.rules.xml"
-    CLI_PHPUNIT: "php -dzend_extension=xdebug.so -dmemory_limit=-1 vendor/bin/phpunit -v --colors=never --coverage-text --coverage-html public/_tests/coverage/ --log-junit public/_tests/junit.xml"
+    CLI_PHPUNIT: "php -dzend_extension=xdebug.so -dxdebug.mode=coverage -dmemory_limit=-1 vendor/bin/phpunit -v --colors=never --coverage-text --coverage-html public/_tests/coverage/ --log-junit public/_tests/junit.xml"
     CLI_PHPUNIT_PARAM: ""
     CLI_COMPOSER:       "composer install --no-progress --ansi -n --no-plugins --no-suggest"
     CLI_COMPOSER_NODEV: "composer install --no-progress --ansi -n --no-plugins --no-suggest --no-dev"
