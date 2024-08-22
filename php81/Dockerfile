@@ -59,6 +59,9 @@ ENV TZ=Europe/Berlin
 # configure and install PHP extensions
 RUN docker-php-ext-configure calendar \
     && docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
+        --with-webp \
     && docker-php-ext-configure intl \
         --enable-intl \
     && docker-php-ext-install -j"$(nproc)" \
