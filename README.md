@@ -28,7 +28,7 @@ Dieses Repository ist lizenziert als MIT
 To keep our branch names organized and easily understandable, we follow a specific naming convention for all branches created in this repository. Please adhere to this convention when creating new branches:
 
 1. **type**: The type of work the branch represents. This should be one of the following:
-   - `upgrade`: For new PHP Upgrade or enhancements.
+   - `feature`: For new features, PHP Upgrade or enhancements.
    - `bugfix`: For bug fixes.
    - `hotfix`: For urgent fixes that need to be applied quickly.
    - `cleanup`: For code refactoring, or documentation updates.
@@ -49,7 +49,7 @@ To keep our branch names organized and easily understandable, we follow a specif
 
 #### Examples
 
-- **Upgrade Branch**: `upgrade-zms-12345-add-base-image-for-php-8-2`
+- **Feature Branch**: `feature-zms-12345-add-base-image-for-php-8-2`
 - **Bugfix Branch**: `bugfix-mpdzbs-67890-fix-crash-on-startup`
 - **Hotfix Branch**: `hotfix-zms-98765-critical-fix-for-login`
 - **Cleanup Branch**: `cleanup-mpdzbs-11111-remove-unused-code`
