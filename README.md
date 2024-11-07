@@ -4,6 +4,8 @@ The current appointment system of the city of Munich will be replaced by Zeitman
 
 This repository has the definition for PHP base images for Docker.
 
+The original Repository can be found at gitlab.com/eappointment/php-base
+
 For more details on the project, see https://github.com/it-at-m/eappointment
 
 ## License
@@ -14,6 +16,8 @@ This repository is licensed as MIT
 Das derzeitige Terminsystem der Stadt München wird durch das vom Land Berlin bereitgestellte Zeitmanagementsystem (ZMS) ersetzt. 
 
 Dieses Repository enthält die Definition für PHP-Basis-Images für Docker.
+
+Das Original-Repository finden Sie unter gitlab.com/eappointment/php-base
 
 Weitere Einzelheiten über das Projekt finden Sie unter https://github.com/it-at-m/eappointment
 
