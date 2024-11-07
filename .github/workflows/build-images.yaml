@@ -9,18 +9,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # General environment variables
-      IMAGE: ghcr.io/it-at-m/eappointment-php-base  # GHCR image path
+      IMAGE: ghcr.io/it-at-m/eappointment-php-base
       COMPOSER_VERSION: "2"
-      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub's default token for public repos
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      VERSION: "latest"
 
     permissions:
-      packages: write  # Grant permissions to write to the GHCR
+      packages: write
 
     services:
       docker:
         image: docker:stable
-        options: --privileged # needed to run Docker-in-Docker
+        options: --privileged
 
     steps:
       - name: Checkout code
