@@ -6,22 +6,18 @@ on:
       - main
 
 jobs:
-  build:
+  php_v8_1:
     runs-on: ubuntu-latest
     env:
-      # General environment variables
       IMAGE: ghcr.io/it-at-m/eappointment-php-base  # GHCR image path
+      VERSION: "8.1"
+      DOCKERFILE: php81/Dockerfile
+      XDEBUG_VERSION: "xdebug-3.1.3"
       COMPOSER_VERSION: "2"
-      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub's default token for public repos
-      VERSION: "latest"  # Default version to avoid empty tag errors
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     permissions:
-      packages: write  # Grant permissions to write to the GHCR
-
-    services:
-      docker:
-        image: docker:stable
-        options: --privileged # needed to run Docker-in-Docker
+      packages: write
 
     steps:
       - name: Checkout code
@@ -63,46 +59,161 @@ jobs:
       - name: Push dev image to GHCR
         run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-dev"
 
-  php_v8_1:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      VERSION: "8.1"
-      DOCKERFILE: php81/Dockerfile
-      XDEBUG_VERSION: "xdebug-3.1.3"
-    steps:
-      - name: Trigger PHP 8.1 Build
-        run: echo "PHP 8.1 build completed"
-
   php_v8_0:
-    needs: build
     runs-on: ubuntu-latest
     env:
+      IMAGE: ghcr.io/it-at-m/eappointment-php-base
       VERSION: "8.0"
       DOCKERFILE: php80/Dockerfile
       XDEBUG_VERSION: "xdebug-3.1.3"
+      COMPOSER_VERSION: "2"
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    permissions:
+      packages: write
+
     steps:
-      - name: Trigger PHP 8.0 Build
-        run: echo "PHP 8.0 build completed"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ env.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull existing image for cache (if any)
+        run: |
+          docker pull "${{ env.IMAGE }}:${{ env.VERSION }}-dev" || echo "No preexisting image found"
+
+      - name: Build base image
+        run: |
+          docker build --pull \
+            --build-arg XDEBUG_VERSION=${{ env.XDEBUG_VERSION }} \
+            --build-arg COMPOSER_VERSION=${{ env.COMPOSER_VERSION }} \
+            --target base \
+            -f "${{ env.DOCKERFILE }}" \
+            -t "${{ env.IMAGE }}:${{ env.VERSION }}-base" \
+            .
+
+      - name: Build dev image without cache
+        run: |
+          docker build --pull --no-cache \
+            --build-arg XDEBUG_VERSION=${{ env.XDEBUG_VERSION }} \
+            --build-arg COMPOSER_VERSION=${{ env.COMPOSER_VERSION }} \
+            --target dev \
+            -f "${{ env.DOCKERFILE }}" \
+            -t "${{ env.IMAGE }}:${{ env.VERSION }}-dev" \
+            .
+
+      - name: Validate PHP setup
+        run: docker run --rm -i "${{ env.IMAGE }}:${{ env.VERSION }}-dev" php-fpm -t
+
+      - name: Push base image to GHCR
+        run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-base"
+
+      - name: Push dev image to GHCR
+        run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-dev"
 
   php_v7_4:
-    needs: build
     runs-on: ubuntu-latest
     env:
+      IMAGE: ghcr.io/it-at-m/eappointment-php-base
       VERSION: "7.4"
       DOCKERFILE: php74/Dockerfile
       XDEBUG_VERSION: "xdebug-2.9.8"
+      COMPOSER_VERSION: "2"
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    permissions:
+      packages: write
+
     steps:
-      - name: Trigger PHP 7.4 Build
-        run: echo "PHP 7.4 build completed"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ env.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull existing image for cache (if any)
+        run: |
+          docker pull "${{ env.IMAGE }}:${{ env.VERSION }}-dev" || echo "No preexisting image found"
+
+      - name: Build base image
+        run: |
+          docker build --pull \
+            --build-arg XDEBUG_VERSION=${{ env.XDEBUG_VERSION }} \
+            --build-arg COMPOSER_VERSION=${{ env.COMPOSER_VERSION }} \
+            --target base \
+            -f "${{ env.DOCKERFILE }}" \
+            -t "${{ env.IMAGE }}:${{ env.VERSION }}-base" \
+            .
+
+      - name: Build dev image without cache
+        run: |
+          docker build --pull --no-cache \
+            --build-arg XDEBUG_VERSION=${{ env.XDEBUG_VERSION }} \
+            --build-arg COMPOSER_VERSION=${{ env.COMPOSER_VERSION }} \
+            --target dev \
+            -f "${{ env.DOCKERFILE }}" \
+            -t "${{ env.IMAGE }}:${{ env.VERSION }}-dev" \
+            .
+
+      - name: Validate PHP setup
+        run: docker run --rm -i "${{ env.IMAGE }}:${{ env.VERSION }}-dev" php-fpm -t
+
+      - name: Push base image to GHCR
+        run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-base"
+
+      - name: Push dev image to GHCR
+        run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-dev"
 
   php_v7_3:
-    needs: build
     runs-on: ubuntu-latest
     env:
+      IMAGE: ghcr.io/it-at-m/eappointment-php-base
       VERSION: "7.3"
       DOCKERFILE: php73/Dockerfile
       XDEBUG_VERSION: "xdebug-2.9.8"
+      COMPOSER_VERSION: "2"
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    permissions:
+      packages: write
+
     steps:
-      - name: Trigger PHP 7.3 Build
-        run: echo "PHP 7.3 build completed"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ env.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull existing image for cache (if any)
+        run: |
+          docker pull "${{ env.IMAGE }}:${{ env.VERSION }}-dev" || echo "No preexisting image found"
+
+      - name: Build base image
+        run: |
+          docker build --pull \
+            --build-arg XDEBUG_VERSION=${{ env.XDEBUG_VERSION }} \
+            --build-arg COMPOSER_VERSION=${{ env.COMPOSER_VERSION }} \
+            --target base \
+            -f "${{ env.DOCKERFILE }}" \
+            -t "${{ env.IMAGE }}:${{ env.VERSION }}-base" \
+            .
+
+      - name: Build dev image without cache
+        run: |
+          docker build --pull --no-cache \
+            --build-arg XDEBUG_VERSION=${{ env.XDEBUG_VERSION }} \
+            --build-arg COMPOSER_VERSION=${{ env.COMPOSER_VERSION }} \
+            --target dev \
+            -f "${{ env.DOCKERFILE }}" \
+            -t "${{ env.IMAGE }}:${{ env.VERSION }}-dev" \
+            .
+
+      - name: Validate PHP setup
+        run: docker run --rm -i "${{ env.IMAGE }}:${{ env.VERSION }}-dev" php-fpm -t
+
+      - name: Push base image to GHCR
+        run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-base"
+
+      - name: Push dev image to GHCR
+        run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-dev"
