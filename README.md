@@ -1,3 +1,12 @@
+<div id="top"></div>
+
+<!-- PROJECT SHIELDS -->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+
 # E-Appointment PHP Base
 
 The current appointment system of the city of Munich will be replaced by Zeitmanagementsystem (ZMS) provided by the state of Berlin.
@@ -57,3 +66,19 @@ To keep our branch names organized and easily understandable, we follow a specif
 - **Cleanup Branch**: `cleanup-mpdzbs-11111-remove-unused-code`
 - **Chore Branch**: `chore-zms-2964-composer-update`
 - **Docs Branch**: `docs-zms-0000-update-readme` `docs-zms-release-40-update-changelog`
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/it-at-m/eappointment-php-base.svg?style=for-the-badge
+[contributors-url]: https://github.com/it-at-m/eappointment-php-base/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/it-at-m/eappointment-php-base.svg?style=for-the-badge
+[forks-url]: https://github.com/it-at-m/eappointment-php-base/network/members
+[stars-shield]: https://img.shields.io/github/stars/it-at-m/eappointment-php-base.svg?style=for-the-badge
+[stars-url]: https://github.com/it-at-m/eappointment-php-base/stargazers
+[issues-shield]: https://img.shields.io/github/issues/it-at-m/eappointment-php-base.svg?style=for-the-badge
+[issues-url]: https://github.com/it-at-m/eappointment-php-base/issues
+[license-shield]: https://img.shields.io/github/license/it-at-m/eappointment-php-base.svg?style=for-the-badge
+[license-url]: https://github.com/it-at-m/eappointment-php-base/blob/main/LICENSE
+[product-screenshot]: images/screenshot.png
