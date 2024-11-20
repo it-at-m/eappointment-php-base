@@ -8,13 +8,13 @@ on:
       - '*'
 
 jobs:
-  php_v8_2:
+  php_v8_3:
     runs-on: ubuntu-latest
     env:
       IMAGE: ghcr.io/it-at-m/eappointment-php-base
-      VERSION: "8.2"
-      DOCKERFILE: php82/Dockerfile
-      XDEBUG_VERSION: "xdebug-3.2.0"
+      VERSION: "8.3"
+      DOCKERFILE: php83/Dockerfile
+      XDEBUG_VERSION: "xdebug-3.3.0"
       COMPOSER_VERSION: "2"
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,13 +61,13 @@ jobs:
       - name: Push dev image to GHCR
         run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-dev"
 
-  php_v8_3:
+  php_v8_2:
     runs-on: ubuntu-latest
     env:
       IMAGE: ghcr.io/it-at-m/eappointment-php-base
-      VERSION: "8.3"
-      DOCKERFILE: php83/Dockerfile
-      XDEBUG_VERSION: "xdebug-3.3.0"
+      VERSION: "8.2"
+      DOCKERFILE: php82/Dockerfile
+      XDEBUG_VERSION: "xdebug-3.2.0"
       COMPOSER_VERSION: "2"
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
