@@ -1,5 +1,5 @@
 ARG COMPOSER_VERSION="2"
-ARG PHP_VERSION="8.0-fpm-bullseye"
+ARG PHP_VERSION="8.4-fpm-bullseye"
 
 # composer version to make available in built image
 FROM composer:${COMPOSER_VERSION} AS composer-image
