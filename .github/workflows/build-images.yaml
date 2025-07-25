@@ -13,7 +13,7 @@ jobs:
     env:
       IMAGE: ghcr.io/it-at-m/eappointment-php-base
       VERSION: "8.4"
-      DOCKERFILE: php83/Dockerfile
+      DOCKERFILE: php84/Dockerfile
       XDEBUG_VERSION: "xdebug-3.3.0"
       COMPOSER_VERSION: "2"
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
