@@ -106,4 +106,4 @@ ENV COMPOSER_HOME=/tmp/composer
 RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
 # Add current node version
-RUN docker-node-install node_16.x
+RUN docker-node-install node_18.x
