@@ -8,6 +8,116 @@
 [![MIT License][license-shield]][license-url]
 
 # E-Appointment PHP Base
+Infrastructure Foundation: eappointment-php-base provides standardized PHP runtime environments for eappointment [build](https://github.com/it-at-m/eappointment/blob/main/.github/workflows/php-build-images.yaml) via the [Containerfile](https://github.com/it-at-m/eappointment/blob/main/.resources/Containerfile).
+
+```mermaid
+%%{init: {"flowchart": {"defaultRenderer":"elk"}}}%%
+graph TD
+    %% Infrastructure Foundation
+    subgraph InfrastructureFoundation["Infrastructure Foundation"]
+        PHPBASE["eappointment-php-base<br>🐳 PHP Docker Base Images<br>Runtime Environment"]
+    end
+
+    %% Main ZMS module dependencies
+    zmsapi --> zmsslim
+    zmsapi --> zmsclient
+    zmsapi --> zmsdldb
+    zmsapi --> zmsdb
+    zmsapi --> zmsentities
+
+    zmsadmin --> mellon
+    zmsadmin --> zmsclient
+    zmsadmin --> zmsslim
+    zmsadmin --> zmsentities
+
+    zmscalldisplay --> mellon
+    zmscalldisplay --> zmsclient
+    zmscalldisplay --> zmsentities
+    zmscalldisplay --> zmsslim
+
+    zmsstatistic --> mellon
+    zmsstatistic --> zmsentities
+    zmsstatistic --> zmsslim
+    zmsstatistic --> zmsclient
+
+    zmsmessaging --> mellon
+    zmsmessaging --> zmsclient
+    zmsmessaging --> zmsentities
+    zmsmessaging --> zmsslim
+
+    zmsdb --> zmsentities
+    zmsdb --> zmsdldb
+    zmsdb --> mellon
+
+    zmsclient --> zmsentities
+    zmsclient --> zmsslim
+    zmsclient --> mellon
+
+    zmsentities --> mellon
+    zmsslim --> mellon
+
+    %% zmscitizenapi dependencies
+    zmscitizenapi --> mellon
+    zmscitizenapi --> zmsslim
+    zmscitizenapi --> zmsclient
+    zmscitizenapi --> zmsentities
+
+    %% Build dependencies (dashed lines)
+    zmscitizenapi -.-> zmsapi
+    refarch_gateway -.-> zmscitizenapi
+    zmscitizenview -.-> refarch_gateway
+
+    %% Infrastructure provides runtime foundation
+    PHPBASE -->|provides runtime for| zmsapi
+    PHPBASE -->|provides runtime for| zmsadmin
+    PHPBASE -->|provides runtime for| zmscalldisplay
+    PHPBASE -->|provides runtime for| zmsstatistic
+    PHPBASE -->|provides runtime for| zmsmessaging
+    PHPBASE -->|provides runtime for| zmsdb
+    PHPBASE -->|provides runtime for| zmsclient
+    PHPBASE -->|provides runtime for| zmsentities
+    PHPBASE -->|provides runtime for| zmsslim
+    PHPBASE -->|provides runtime for| zmsdldb
+    PHPBASE -->|provides runtime for| mellon
+    PHPBASE -->|provides runtime for| zmscitizenapi
+
+    %% Group refarch_gateway and zmscitizenview into a subgraph
+    subgraph refarch["refarch"]
+        style refarch stroke-dasharray:5
+        refarch_gateway
+        zmscitizenview
+    end
+
+    %% Group remaining modules into dashed PHP-style subgraph
+    subgraph zms_modules["ZMS PHP Modules"]
+        style zms_modules stroke-dasharray:5 5 1 5
+        zmsapi
+        zmsadmin
+        zmscalldisplay
+        zmsstatistic
+        zmsmessaging
+        zmsdb
+        zmsclient
+        zmsentities
+        zmsslim
+        zmsdldb
+        mellon
+        zmscitizenapi
+    end
+
+    %% Styling for the infrastructure foundation
+    classDef foundation fill:#e3f2fd,stroke:#0277bd,stroke-width:3px
+
+    %% Styling for the three modules
+    classDef citizenapi fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef gateway fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef citizenview fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+
+    class PHPBASE foundation
+    class zmscitizenapi citizenapi
+    class refarch_gateway gateway
+    class zmscitizenview citizenview
+```
 
 The current appointment system of the city of Munich will be replaced by Zeitmanagementsystem (ZMS) provided by the state of Berlin.
 
