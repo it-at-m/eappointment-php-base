@@ -111,3 +111,4 @@ RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
 # Add current node version
 RUN docker-node-install node_18.x
+RUN npm install -g @parcel/rust-linux-x64-gnu
