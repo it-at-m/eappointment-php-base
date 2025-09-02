@@ -25,7 +25,10 @@ RUN docker-apt-clean-install \
         git \
         wget \
         gnupg2 \
-        python3-multiprocessing \
+        python3 \
+        python3-dev \
+        python3-pip \
+        build-essential \
         #gosu \
         libbz2-dev \
         #libexif-dev \
