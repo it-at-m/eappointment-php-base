@@ -107,3 +107,7 @@ RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
 # Add current node version
 RUN docker-node-install node_18.x
+
+# Add current Python libraries
+RUN apt update && apt install -y python3 python3-click python3-git && \
+    apt clean && rm -rf /var/lib/apt/lists/*
