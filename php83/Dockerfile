@@ -107,7 +107,7 @@ ENV COMPOSER_HOME=/tmp/composer
 RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
 # Add current node version
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && docker-apt-clean-install nodejs
 
 # Add current Python libraries
