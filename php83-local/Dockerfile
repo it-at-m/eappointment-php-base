@@ -6,9 +6,6 @@ ARG PHP_VERSION=8.3-apache
 # Composer stage
 FROM composer:${COMPOSER_VERSION} AS composer-image
 
-# Node stage
-FROM node:${NODE_MAJOR}-bullseye AS node-image
-
 # Main dev image
 FROM php:${PHP_VERSION}
 
@@ -121,12 +118,10 @@ RUN a2ensite default-ssl
 COPY --from=composer-image /usr/bin/composer /usr/bin/composer
 
 # --------------------------------------------------
-# Node and npm/npx from multi-stage
+# Node and npm/npx
 # --------------------------------------------------
-COPY --from=node-image /usr/local/bin/node /usr/local/bin/node
-COPY --from=node-image /usr/local/bin/npm /usr/local/bin/npm
-COPY --from=node-image /usr/local/bin/npx /usr/local/bin/npx
-COPY --from=node-image /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash - \
+    && docker-apt-clean-install nodejs
 
 # --------------------------------------------------
 # Java 21 (Temurin)
