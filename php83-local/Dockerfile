@@ -30,7 +30,8 @@ ARG FLYWAY_VERSION=11.1.1
 
 ENV TZ="${TZ}" \
     DISPLAY=:99 \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # --------------------------------------------------
 # Timezone
@@ -47,6 +48,7 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" \
 # --------------------------------------------------
 # System dependencies + PHP extensions
 # --------------------------------------------------
+COPY scripts/docker-apt-clean-install /usr/local/sbin/
 RUN docker-apt-clean-install \
       ca-certificates \
       curl \
