@@ -109,8 +109,10 @@ ENV COMPOSER_HOME=/tmp/composer
 # Add locale de_DE.UTF-8
 RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
-# Add node from multi-stage
+# Add Node.js and npm/npx from multi-stage
 COPY --from=node-image /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-image /usr/local/bin/npm /usr/local/bin/npm
+COPY --from=node-image /usr/local/bin/npx /usr/local/bin/npx
 COPY --from=node-image /usr/local/lib/node_modules /usr/local/lib/node_modules
 
 # Add current Python libraries
