@@ -173,4 +173,4 @@ RUN curl -fsSL -o /tmp/flyway.tar.gz \
 WORKDIR /var/www/html
 COPY php83-local/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
-EXPOSE 80
+EXPOSE 80 443
