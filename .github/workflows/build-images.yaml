@@ -113,6 +113,37 @@ jobs:
 
       - name: Push dev image to GHCR
         run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-dev"
+  
+  php_v8_3_local:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE: ghcr.io/it-at-m/eappointment-php-base
+      VERSION: "8.3-local"
+      DOCKERFILE: php83-local/Dockerfile
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    permissions:
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ env.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build dev image without cache
+        run: |
+          docker build --pull --no-cache \
+            -f "${{ env.DOCKERFILE }}" \
+            -t "${{ env.IMAGE }}:${{ env.VERSION }}" \
+            .
+
+      - name: Validate PHP setup
+        run: docker run --rm -i "${{ env.IMAGE }}:${{ env.VERSION }}-dev" php-v -t
+
+      - name: Push base image to GHCR
+        run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}"
 
   php_v8_2:
     runs-on: ubuntu-latest
