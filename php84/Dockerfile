@@ -1,8 +1,12 @@
 ARG COMPOSER_VERSION="2"
+ARG NODE_MAJOR=18
 ARG PHP_VERSION="8.4-fpm-bullseye"
 
 # composer version to make available in built image
 FROM composer:${COMPOSER_VERSION} AS composer-image
+
+# Node stage
+FROM node:${NODE_MAJOR}-bullseye AS node-image
 
 # php version to actually build
 FROM php:${PHP_VERSION} AS base
@@ -105,8 +109,9 @@ ENV COMPOSER_HOME=/tmp/composer
 # Add locale de_DE.UTF-8
 RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
-# Add current node version
-RUN docker-node-install node_18.x
+# Add node from multi-stage
+COPY --from=node-image /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-image /usr/local/lib/node_modules /usr/local/lib/node_modules
 
 # Add current Python libraries
 RUN apt update && apt install -y python3 python3-click python3-git && \
