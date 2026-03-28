@@ -47,7 +47,8 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" \
 # --------------------------------------------------
 # System dependencies + PHP extensions
 # --------------------------------------------------
-RUN docker-apt-clean-install \
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
       ca-certificates \
       curl \
       git \
@@ -79,7 +80,9 @@ RUN docker-apt-clean-install \
       pdo_mysql \
       zip \
       calendar \
- && ln -sf /usr/bin/firefox-esr /usr/bin/firefox
+ && ln -sf /usr/bin/firefox-esr /usr/bin/firefox \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
 # --------------------------------------------------
 # Xdebug
