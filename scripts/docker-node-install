@@ -2,11 +2,11 @@
 
 set -eo pipefail
 
-export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
-curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - 
-echo "deb https://deb.nodesource.com/${1} nodistro main" | tee /etc/apt/sources.list.d/nodesource.list 
-echo "deb-src https://deb.nodesource.com/${1} nodistro main" | tee -a /etc/apt/sources.list.d/nodesource.list 
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor -o /usr/share/keyrings/nodesource.gpg
 
-docker-apt-clean-install nodejs 
+echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/${1} nodistro main" \
+  > /etc/apt/sources.list.d/nodesource.list
+echo "deb-src [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/${1} nodistro main" \
+  >> /etc/apt/sources.list.d/nodesource.list
 
-
+docker-apt-clean-install nodejs
