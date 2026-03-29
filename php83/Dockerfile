@@ -87,7 +87,7 @@ RUN docker-php-ext-configure calendar \
         zip \
     && rm -rf /usr/src/
 
-FROM base as dev
+FROM base AS dev
 
 COPY scripts/ /usr/local/sbin/
 
