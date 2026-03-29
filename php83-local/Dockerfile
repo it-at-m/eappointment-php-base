@@ -15,9 +15,6 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Build args
 # --------------------------------------------------
 ARG TZ=Europe/Berlin
-ARG USERNAME=vscode
-ARG USER_UID=1000
-ARG USER_GID=1000
 
 ARG XDEBUG_VERSION=3.5.1
 ARG EDGE_DRIVER_VERSION=146.0.3856.62
@@ -36,12 +33,6 @@ ENV TZ="${TZ}" \
 # --------------------------------------------------
 RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime \
  && echo "${TZ}" > /etc/timezone
-
-# --------------------------------------------------
-# User (for dev containers / vscode)
-# --------------------------------------------------
-RUN groupadd --gid "${USER_GID}" "${USERNAME}" \
- && useradd -m -u "${USER_UID}" -g "${USER_GID}" -s /bin/bash "${USERNAME}"
 
 # --------------------------------------------------
 # System dependencies + PHP extensions
