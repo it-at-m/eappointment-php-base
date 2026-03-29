@@ -24,9 +24,12 @@ ARG EDGE_DRIVER_VERSION=146.0.3856.62
 ARG MAVEN_VERSION=3.9.12
 ARG FLYWAY_VERSION=11.1.1
 
+COPY scripts/docker-apt-clean-install /usr/local/sbin/
+
 ENV TZ="${TZ}" \
     DISPLAY=:99 \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # --------------------------------------------------
 # Timezone
