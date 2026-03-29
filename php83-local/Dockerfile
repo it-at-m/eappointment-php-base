@@ -90,21 +90,7 @@ RUN chmod +x /usr/local/bin/install-edge \
 # --------------------------------------------------
 # Apache modules
 # --------------------------------------------------
-RUN a2enmod rewrite proxy_fcgi alias headers ssl
-
-# --------------------------------------------------
-# Self-signed SSL certificate
-# --------------------------------------------------
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout /etc/ssl/private/apache-selfsigned.key \
-  -out /etc/ssl/certs/apache-selfsigned.crt \
-  -subj "/C=DE/ST=Dev/L=Dev/O=Dev/OU=Dev/CN=localhost"
-
-# --------------------------------------------------
-# SSL VirtualHost
-# --------------------------------------------------
-COPY php83-local/apache-ssl.conf /etc/apache2/sites-available/default-ssl.conf
-RUN a2ensite default-ssl
+RUN a2enmod rewrite proxy_fcgi alias headers
 
 # --------------------------------------------------
 # Composer
@@ -164,4 +150,4 @@ RUN curl -fsSL -o /tmp/flyway.tar.gz \
 WORKDIR /var/www/html
 COPY php83-local/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
-EXPOSE 80 443
+EXPOSE 80
