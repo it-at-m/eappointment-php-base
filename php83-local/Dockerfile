@@ -123,6 +123,7 @@ COPY --from=composer-image /usr/bin/composer /usr/bin/composer
 # --------------------------------------------------
 # Node and npm/npx
 # --------------------------------------------------
+ARG NODE_MAJOR
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && docker-apt-clean-install nodejs
 

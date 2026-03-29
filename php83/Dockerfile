@@ -1,5 +1,5 @@
 ARG COMPOSER_VERSION="2"
-ARG NODE_MAJOR=18
+ARG NODE_MAJOR="18"
 ARG PHP_VERSION="8.3-fpm-bullseye"
 
 # composer version to make available in built image
@@ -107,6 +107,7 @@ ENV COMPOSER_HOME=/tmp/composer
 RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
 # Add current node version
+ARG NODE_MAJOR
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && docker-apt-clean-install nodejs
 
