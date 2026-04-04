@@ -6,6 +6,8 @@ on:
       - '*'
     tags:
       - '*'
+  schedule:
+    - cron: "0 0 1 * *"
 
 jobs:
   php_v8_4:
