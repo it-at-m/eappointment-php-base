@@ -1,4 +1,5 @@
 ARG COMPOSER_VERSION="2"
+ARG NODE_MAJOR="18"
 ARG PHP_VERSION="8.4-fpm-bullseye"
 
 # composer version to make available in built image
@@ -86,7 +87,7 @@ RUN docker-php-ext-configure calendar \
         zip \
     && rm -rf /usr/src/
 
-FROM base as dev
+FROM base AS dev
 
 COPY scripts/ /usr/local/sbin/
 
@@ -106,7 +107,8 @@ ENV COMPOSER_HOME=/tmp/composer
 RUN echo "de_DE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 
 # Add current node version
-RUN docker-node-install node_18.x
+ARG NODE_MAJOR
+RUN docker-node-install node_${NODE_MAJOR}.x
 
 # Add current Python libraries
 RUN apt update && apt install -y python3 python3-click python3-git && \

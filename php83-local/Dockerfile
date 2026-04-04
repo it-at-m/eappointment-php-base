@@ -1,0 +1,153 @@
+# Global build args
+ARG COMPOSER_VERSION=2
+ARG NODE_MAJOR=18
+ARG PHP_VERSION=8.3-apache-bullseye
+
+# Composer stage
+FROM composer:${COMPOSER_VERSION} AS composer-image
+
+# Main dev image
+FROM php:${PHP_VERSION}
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# --------------------------------------------------
+# Build args
+# --------------------------------------------------
+ARG TZ=Europe/Berlin
+
+ARG XDEBUG_VERSION=3.5.1
+ARG EDGE_DRIVER_VERSION=146.0.3856.62
+ARG MAVEN_VERSION=3.9.12
+ARG FLYWAY_VERSION=11.1.1
+
+COPY scripts/ /usr/local/sbin/
+
+ENV TZ="${TZ}" \
+    DISPLAY=:99 \
+    DEBIAN_FRONTEND=noninteractive \
+    PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# --------------------------------------------------
+# Timezone
+# --------------------------------------------------
+RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime \
+ && echo "${TZ}" > /etc/timezone
+
+# --------------------------------------------------
+# System dependencies + PHP extensions
+# --------------------------------------------------
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl \
+      git \
+      gnupg \
+      unzip \
+      wget \
+      nano \
+      mariadb-client \
+      python3-click \
+      python3-colorama \
+      python3-git \
+      libfreetype6-dev \
+      libicu-dev \
+      libjpeg62-turbo-dev \
+      libpng-dev \
+      libzip-dev \
+      libonig-dev \
+      firefox-esr \
+      xvfb \
+      x11-utils \
+      x11-xserver-utils \
+      chromium \
+      chromium-driver \
+ && docker-php-ext-configure gd --with-freetype --with-jpeg \
+ && docker-php-ext-install -j"$(nproc)" \
+      intl \
+      gd \
+      pdo \
+      pdo_mysql \
+      zip \
+      calendar \
+ && ln -sf /usr/bin/firefox-esr /usr/bin/firefox \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+# --------------------------------------------------
+# Xdebug
+# --------------------------------------------------
+RUN pecl install xdebug-"${XDEBUG_VERSION}" \
+ && docker-php-ext-enable xdebug
+
+# --------------------------------------------------
+# Microsoft Edge + WebDriver (external script)
+# --------------------------------------------------
+COPY php83-local/scripts/install-edge.sh /usr/local/bin/install-edge
+RUN chmod +x /usr/local/bin/install-edge \
+ && install-edge
+
+# --------------------------------------------------
+# Apache modules
+# --------------------------------------------------
+RUN a2enmod rewrite proxy_fcgi alias headers
+
+# --------------------------------------------------
+# Composer
+# --------------------------------------------------
+COPY --from=composer-image /usr/bin/composer /usr/bin/composer
+
+# --------------------------------------------------
+# Node and npm/npx
+# --------------------------------------------------
+ARG NODE_MAJOR
+RUN docker-node-install node_${NODE_MAJOR}.x
+
+# --------------------------------------------------
+# Java 21 (Temurin)
+# --------------------------------------------------
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends gnupg \
+ && curl -fsSL https://packages.adoptium.net/artifactory/api/gpg/key/public \
+    | gpg --batch --no-tty --dearmor -o /usr/share/keyrings/adoptium.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(. /etc/os-release && echo $VERSION_CODENAME) main" \
+    > /etc/apt/sources.list.d/adoptium.list \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends temurin-21-jdk \
+ && ln -sf /usr/lib/jvm/temurin-21-jdk-$(dpkg --print-architecture)/bin/java /usr/local/bin/java \
+ && ln -sf /usr/lib/jvm/temurin-21-jdk-$(dpkg --print-architecture)/bin/javac /usr/local/bin/javac \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+# --------------------------------------------------
+# Maven
+# --------------------------------------------------
+RUN curl -fsSL -o /tmp/maven.tar.gz \
+      "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz" \
+ && curl -fsSL -o /tmp/maven.tar.gz.sha512 \
+      "https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz.sha512" \
+ && echo "$(cat /tmp/maven.tar.gz.sha512)  /tmp/maven.tar.gz" | sha512sum -c - \
+ && tar -xzf /tmp/maven.tar.gz -C /opt \
+ && ln -s /opt/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/local/bin/mvn \
+ && rm -f /tmp/maven.tar.gz /tmp/maven.tar.gz.sha512
+
+# --------------------------------------------------
+# Flyway CLI
+# --------------------------------------------------
+RUN curl -fsSL -o /tmp/flyway.tar.gz \
+      "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz" \
+ && curl -fsSL -o /tmp/flyway.tar.gz.sha1 \
+      "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz.sha1" \
+ && echo "$(cat /tmp/flyway.tar.gz.sha1)  /tmp/flyway.tar.gz" | sha1sum -c - \
+ && tar -xzf /tmp/flyway.tar.gz -C /opt \
+ && ln -s /opt/flyway-${FLYWAY_VERSION}/flyway /usr/local/bin/flyway \
+ && rm -f /tmp/flyway.tar.gz /tmp/flyway.tar.gz.sha1
+
+
+# --------------------------------------------------
+# App setup
+# --------------------------------------------------
+WORKDIR /var/www/html
+COPY php83-local/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
+EXPOSE 80
