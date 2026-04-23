@@ -9,6 +9,9 @@ FROM composer:${COMPOSER_VERSION} AS composer-image
 # Main dev image
 FROM php:${PHP_VERSION}
 
+# Set by docker buildx --platform=... (linux/amd64 | linux/arm64)
+ARG TARGETARCH
+
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # --------------------------------------------------
@@ -133,15 +136,22 @@ RUN curl -fsSL -o /tmp/maven.tar.gz \
 
 # --------------------------------------------------
 # Flyway CLI
+# Maven only ships flyway-commandline-*-linux-x64.tar.gz (amd64). For arm64
+# builds use the generic .tar.gz (uses the Temurin JDK installed above).
 # --------------------------------------------------
-RUN curl -fsSL -o /tmp/flyway.tar.gz \
-      "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz" \
- && curl -fsSL -o /tmp/flyway.tar.gz.sha1 \
-      "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz.sha1" \
- && echo "$(cat /tmp/flyway.tar.gz.sha1)  /tmp/flyway.tar.gz" | sha1sum -c - \
- && tar -xzf /tmp/flyway.tar.gz -C /opt \
- && ln -s /opt/flyway-${FLYWAY_VERSION}/flyway /usr/local/bin/flyway \
- && rm -f /tmp/flyway.tar.gz /tmp/flyway.tar.gz.sha1
+RUN set -eux; \
+  base="https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}"; \
+  if [ "${TARGETARCH}" = "amd64" ]; then \
+    curl -fsSL -o /tmp/flyway.tar.gz "${base}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz"; \
+    curl -fsSL -o /tmp/flyway.tar.gz.sha1 "${base}/flyway-commandline-${FLYWAY_VERSION}-linux-x64.tar.gz.sha1"; \
+  else \
+    curl -fsSL -o /tmp/flyway.tar.gz "${base}/flyway-commandline-${FLYWAY_VERSION}.tar.gz"; \
+    curl -fsSL -o /tmp/flyway.tar.gz.sha1 "${base}/flyway-commandline-${FLYWAY_VERSION}.tar.gz.sha1"; \
+  fi; \
+  echo "$(cat /tmp/flyway.tar.gz.sha1)  /tmp/flyway.tar.gz" | sha1sum -c -; \
+  tar -xzf /tmp/flyway.tar.gz -C /opt; \
+  ln -sf "/opt/flyway-${FLYWAY_VERSION}/flyway" /usr/local/bin/flyway; \
+  rm -f /tmp/flyway.tar.gz /tmp/flyway.tar.gz.sha1
 
 
 # --------------------------------------------------
