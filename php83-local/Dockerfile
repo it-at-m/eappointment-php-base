@@ -151,9 +151,11 @@ COPY --from=composer-image /usr/bin/composer /usr/bin/composer
 
 # --------------------------------------------------
 # Node and npm/npx (copy from official node image — reliable on amd64 + arm64)
+# Copy the full global node_modules tree: /usr/local/bin/npm is a shim that
+# requires the bundled npm package layout (copying only .../npm is not enough).
 # --------------------------------------------------
+COPY --from=node-tools /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node-tools /usr/local/bin/node /usr/local/bin/node
-COPY --from=node-tools /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
 COPY --from=node-tools /usr/local/bin/npm /usr/local/bin/npm
 COPY --from=node-tools /usr/local/bin/npx /usr/local/bin/npx
 RUN node --version && npm --version && npx --version
