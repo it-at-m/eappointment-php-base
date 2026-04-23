@@ -1,6 +1,5 @@
 # Global build args
 ARG COMPOSER_VERSION=2
-ARG NODE_MAJOR=18
 ARG PHP_VERSION=8.3-apache
 
 # Composer stage
@@ -147,9 +146,9 @@ RUN a2enmod rewrite proxy_fcgi alias headers
 COPY --from=composer-image /usr/bin/composer /usr/bin/composer
 
 # --------------------------------------------------
-# Node and npm/npx
+# Node and npm/npx (ARG belongs in this stage; not inherited from before FROM)
 # --------------------------------------------------
-ARG NODE_MAJOR
+ARG NODE_MAJOR=18
 RUN docker-node-install node_${NODE_MAJOR}.x
 
 # --------------------------------------------------
