@@ -84,11 +84,57 @@ RUN pecl install xdebug-"${XDEBUG_VERSION}" \
  && docker-php-ext-enable xdebug
 
 # --------------------------------------------------
-# Microsoft Edge + WebDriver (external script)
+# Microsoft Edge + WebDriver (aligned with .devcontainer/Containerfile)
 # --------------------------------------------------
-COPY php83-local/scripts/install-edge.sh /usr/local/bin/install-edge
-RUN chmod +x /usr/local/bin/install-edge \
- && install-edge
+RUN set -euo pipefail; \
+    ARCH="$(dpkg --print-architecture)"; \
+    if [ "$ARCH" = "amd64" ]; then \
+      mkdir -p /etc/apt/keyrings \
+   && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+      | gpg --batch --no-tty --dearmor -o /etc/apt/keyrings/microsoft.gpg \
+   && echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main" \
+      > /etc/apt/sources.list.d/microsoft-edge.list \
+   && apt-get update \
+   && apt-get install -y microsoft-edge-stable \
+   && EDGE_VERSION="$(microsoft-edge --version | awk '{print $3}')" \
+   && EDGE_VERSION="${EDGE_VERSION%%-*}" \
+   && curl -fsSL -o /tmp/msedgedriver.zip \
+        "https://msedgedriver.microsoft.com/${EDGE_VERSION}/edgedriver_linux64.zip" \
+   && unzip -o /tmp/msedgedriver.zip -d /tmp \
+   && mv /tmp/msedgedriver /usr/local/bin/msedgedriver \
+   && chmod +x /usr/local/bin/msedgedriver \
+   && rm -f /tmp/msedgedriver.zip ; \
+      apt-get clean \
+   && rm -rf /var/lib/apt/lists/* ; \
+    elif [ "$ARCH" = "arm64" ]; then \
+      mkdir -p /etc/apt/keyrings \
+   && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+      | gpg --batch --no-tty --dearmor -o /etc/apt/keyrings/microsoft.gpg \
+   && echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main" \
+      > /etc/apt/sources.list.d/microsoft-edge.list \
+   && apt-get update || true \
+   && apt-get install -y microsoft-edge-stable || true \
+   && if command -v microsoft-edge >/dev/null 2>&1; then \
+        EDGE_VERSION="$(microsoft-edge --version | awk '{print $3}')"; \
+      else \
+        EDGE_VERSION="${EDGE_DRIVER_VERSION}"; \
+      fi \
+   && EDGE_VERSION="${EDGE_VERSION%%-*}" \
+   && curl -fsSL -o /tmp/msedgedriver.zip \
+        "https://msedgedriver.microsoft.com/${EDGE_VERSION}/edgedriver_arm64.zip" \
+   && unzip -o /tmp/msedgedriver.zip -d /tmp \
+   && if [ -f /tmp/msedgedriver ]; then \
+        mv /tmp/msedgedriver /usr/local/bin/msedgedriver; \
+      else \
+        mv /tmp/*/msedgedriver /usr/local/bin/msedgedriver; \
+      fi \
+   && chmod +x /usr/local/bin/msedgedriver \
+   && rm -f /tmp/msedgedriver.zip \
+   && apt-get clean || true \
+   && rm -rf /var/lib/apt/lists/* || true ; \
+    else \
+      echo "Skipping Microsoft EdgeDriver install for unsupported arch: $ARCH"; \
+    fi
 
 # --------------------------------------------------
 # Apache modules
