@@ -1,9 +1,13 @@
 # Global build args
 ARG COMPOSER_VERSION=2
+ARG NODE_MAJOR=18
 ARG PHP_VERSION=8.3-apache
 
 # Composer stage
 FROM composer:${COMPOSER_VERSION} AS composer-image
+
+# Node/npm/npx (official multi-arch image; NodeSource apt can miss npm on some Debian/arch combos)
+FROM node:${NODE_MAJOR}-bookworm AS node-tools
 
 # Main dev image
 FROM php:${PHP_VERSION}
@@ -146,10 +150,13 @@ RUN a2enmod rewrite proxy_fcgi alias headers
 COPY --from=composer-image /usr/bin/composer /usr/bin/composer
 
 # --------------------------------------------------
-# Node and npm/npx (ARG belongs in this stage; not inherited from before FROM)
+# Node and npm/npx (copy from official node image — reliable on amd64 + arm64)
 # --------------------------------------------------
-ARG NODE_MAJOR=18
-RUN docker-node-install node_${NODE_MAJOR}.x
+COPY --from=node-tools /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-tools /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+COPY --from=node-tools /usr/local/bin/npm /usr/local/bin/npm
+COPY --from=node-tools /usr/local/bin/npx /usr/local/bin/npx
+RUN node --version && npm --version && npx --version
 
 # --------------------------------------------------
 # Java 21 (Temurin)
