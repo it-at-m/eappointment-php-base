@@ -126,12 +126,16 @@ RUN set -euo pipefail; \
    && curl -fsSL -o /tmp/msedgedriver.zip \
         "https://msedgedriver.microsoft.com/${EDGE_VERSION}/edgedriver_arm64.zip" \
    && unzip -o /tmp/msedgedriver.zip -d /tmp \
-   && if [ -f /tmp/msedgedriver ]; then \
-        mv /tmp/msedgedriver /usr/local/bin/msedgedriver; \
+   && if [ -f /tmp/msedgedriver.exe ]; then \
+        echo "Skipping msedgedriver on linux/arm64: edgedriver_arm64.zip is Windows-only (msedgedriver.exe)."; \
+      elif [ -f /tmp/msedgedriver ]; then \
+        mv /tmp/msedgedriver /usr/local/bin/msedgedriver \
+     && chmod +x /usr/local/bin/msedgedriver; \
       else \
-        mv /tmp/*/msedgedriver /usr/local/bin/msedgedriver; \
+        drv="$(find /tmp -maxdepth 3 -type f -name msedgedriver ! -name '*.exe' 2>/dev/null | head -n1)"; \
+        if [ -n "${drv:-}" ]; then mv "$drv" /usr/local/bin/msedgedriver && chmod +x /usr/local/bin/msedgedriver; \
+        else echo "Skipping msedgedriver on linux/arm64: no Unix binary in archive."; fi; \
       fi \
-   && chmod +x /usr/local/bin/msedgedriver \
    && rm -f /tmp/msedgedriver.zip \
    && apt-get clean || true \
    && rm -rf /var/lib/apt/lists/* || true ; \
@@ -151,14 +155,28 @@ COPY --from=composer-image /usr/bin/composer /usr/bin/composer
 
 # --------------------------------------------------
 # Node and npm/npx (copy from official node image — reliable on amd64 + arm64)
-# Copy the full global node_modules tree: /usr/local/bin/npm is a shim that
-# requires the bundled npm package layout (copying only .../npm is not enough).
+# Copy the full global node_modules tree. Do not COPY /usr/local/bin/npm from
+# upstream: that file is a shim that does require('../lib/cli.js') relative to
+# /usr/local/bin, which breaks after copy. Point npm/npx at the real CLIs.
 # --------------------------------------------------
 COPY --from=node-tools /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node-tools /usr/local/bin/node /usr/local/bin/node
-COPY --from=node-tools /usr/local/bin/npm /usr/local/bin/npm
-COPY --from=node-tools /usr/local/bin/npx /usr/local/bin/npx
-RUN node --version && npm --version && npx --version
+RUN set -eux; \
+  for c in npm-cli.js npm-cli.cjs npm-cli.mjs; do \
+    if [ -f "/usr/local/lib/node_modules/npm/bin/${c}" ]; then \
+      ln -sf "/usr/local/lib/node_modules/npm/bin/${c}" /usr/local/bin/npm; \
+      break; \
+    fi; \
+  done; \
+  test -L /usr/local/bin/npm; \
+  for c in npx-cli.js npx-cli.cjs npx-cli.mjs; do \
+    if [ -f "/usr/local/lib/node_modules/npm/bin/${c}" ]; then \
+      ln -sf "/usr/local/lib/node_modules/npm/bin/${c}" /usr/local/bin/npx; \
+      break; \
+    fi; \
+  done; \
+  test -L /usr/local/bin/npx; \
+  node --version && npm --version && npx --version
 
 # --------------------------------------------------
 # Java 21 (Temurin)
