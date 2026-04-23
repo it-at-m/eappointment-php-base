@@ -117,10 +117,20 @@ jobs:
         run: docker push "${{ env.IMAGE }}:${{ env.VERSION }}-dev"
   
   php_v8_3_local:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux/amd64
+            tag_suffix: amd64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+            tag_suffix: arm64
+    runs-on: ${{ matrix.runner }}
     env:
       IMAGE: ghcr.io/it-at-m/eappointment-php-base
-      VERSION: "8.3-local"
+      VERSION_BASE: "8.3-local"
       DOCKERFILE: php83-local/Dockerfile
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -134,20 +144,17 @@ jobs:
       - name: Log in to GitHub Container Registry
         run: echo "${{ env.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push multi-arch image (amd64 + arm64)
+      - name: Build and push single-arch image
         run: |
-          docker buildx build --pull --no-cache \
-            --platform linux/amd64,linux/arm64 \
+          TAG="${{ env.VERSION_BASE }}-${{ matrix.tag_suffix }}"
+          docker build --pull --no-cache \
+            --platform "${{ matrix.platform }}" \
             -f "${{ env.DOCKERFILE }}" \
-            -t "${{ env.IMAGE }}:${{ env.VERSION }}" \
-            --push \
+            -t "${{ env.IMAGE }}:${TAG}" \
             .
+          docker push "${{ env.IMAGE }}:${TAG}"
 
-      - name: Validate PHP setup (native amd64 on runner)
-        run: docker run --rm -i "${{ env.IMAGE }}:${{ env.VERSION }}" php -v
+      - name: Validate PHP setup
+        run: |
+          TAG="${{ env.VERSION_BASE }}-${{ matrix.tag_suffix }}"
+          docker run --rm -i "${{ env.IMAGE }}:${TAG}" php -v
